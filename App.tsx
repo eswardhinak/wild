@@ -25,9 +25,12 @@ export default function App() {
 
   useEffect(() => {
     (async () => {
-      let location = await Location.getCurrentPositionAsync({});
-      console.log(location.coords)
-      setLocation(location);
+      if (foreground?.status === 'granted') {
+        console.log("requesting location...");
+        let location = await Location.getCurrentPositionAsync(optionParams);
+        console.log(location.coords)
+        setLocation(location);
+      }
     })();
     const interval = setInterval(() => {
       setRerender(!rerenderRef.current);
@@ -39,7 +42,7 @@ export default function App() {
   //  1. Foreground permission needs to be granted before asking background permission
   //  2. Whenever the user repeatedly blocks a permission, `canAskAgain` will be false and we _have_ to open app settings
   //  3. When opening app settings, we need to manually refresh the permissions in order to update the states
-  if (foreground?.status === 'granted' && background?.status === 'granted' && location != null) {
+  if (foreground?.status === 'granted' || background?.status === 'granted' && location != null) {
     return <MapScreen location={location} rerender={rerender}/>
   }
   else {
